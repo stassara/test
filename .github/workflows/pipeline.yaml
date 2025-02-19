@@ -23,8 +23,8 @@ jobs:
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: $AWS_S3_ACCESS_KEY
+          aws-secret-access-key: $AWS_S3_SECRET_KEY
           aws-region: us-east-1
 
       - name: Setup minio
@@ -35,10 +35,6 @@ jobs:
             -v /tmp/data:/data \
             -v /tmp/config:/root/.minio \
             minio/minio server /data
-
-          export AWS_ACCESS_KEY_ID=minioadmin
-          export AWS_SECRET_ACCESS_KEY=minioadmin
-          export AWS_EC2_METADATA_DISABLED=true
 
           aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://testbucket
 
