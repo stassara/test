@@ -41,4 +41,4 @@ jobs:
           print('File created successfully.')
           os.system('aws --endpoint-url http://localhost:9000 s3 cp assets/test.txt s3://test-bucket/test.txt')
           """ > script.py
-          docker run --rm --network=host -v $(pwd)/script.py:/script.py python:3.9 bash -c "pip install awscli && python /script.py"
+          docker run --rm -v $(pwd)/script.py:/script.py python:3.9 bash -c "pip install awscli && python /script.py"
