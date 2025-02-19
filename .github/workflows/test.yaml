@@ -12,6 +12,11 @@ jobs:
   run-minio-and-python:
     runs-on: ubuntu-latest
 
+    env:
+      AWS_ENDPOINT_URL: "http://127.0.0.1:9000"
+      AWS_ACCESS_KEY_ID: "minioadmin"
+      AWS_SECRET_ACCESS_KEY: "minioadmin"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
