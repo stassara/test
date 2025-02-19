@@ -23,13 +23,11 @@ def test2_s3_upload():
     bucket_name = os.getenv("AWS_S3_BUCKET", "testbucket")
     endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://127.0.0.1:9000")
 
-    # Crear un archivo de prueba
     test_filename = "testfile.txt"
     with open(test_filename, "w") as f:
         f.write("Hello, MinIO!")
 
-    # Subir el archivo al bucket
-    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/testfile.txt s3://testbucket/testfile.txt"
+    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/testfile.txt s3://testbucket/aaa/testfile.txt"
     print(f"copying source to s3: {cmd}")
     result = subprocess.run(cmd, shell=True, check=True)
 
