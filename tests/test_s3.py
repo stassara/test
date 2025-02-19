@@ -2,7 +2,7 @@ import os
 import subprocess
 
 def test_s3_upload():
-    bucket_name = os.getenv("AWS_S3_BUCKET", "testbucket")
+    bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
     endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://127.0.0.1:9000")
 
     # Crear un archivo de prueba
@@ -20,14 +20,14 @@ def test_s3_upload():
     assert result.returncode == 0, f"Failed to upload file: {result.stderr}"
 
 def test2_s3_upload():
-    bucket_name = os.getenv("AWS_S3_BUCKET", "testbucket")
+    bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
     endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://127.0.0.1:9000")
 
     test_filename = "testfile.txt"
     with open(test_filename, "w") as f:
         f.write("Hello, MinIO!")
 
-    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/testfile.txt s3://testbucket/aaa/testfile.txt"
+    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/testfile.txt s3://test-bucket/aaa/testfile.txt"
     print(f"copying source to s3: {cmd}")
     result = subprocess.run(cmd, shell=True, check=True)
 

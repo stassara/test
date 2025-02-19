@@ -28,7 +28,7 @@ jobs:
             -v /tmp/config:/root/.minio \
             minio/minio server /data
 
-          aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://testbucket
+          aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://test-bucket
 
       - name: Set up Python
         uses: actions/setup-python@v2
