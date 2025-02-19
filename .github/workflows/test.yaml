@@ -23,12 +23,13 @@ jobs:
       
       - name: Start MinIO in Docker
         run: |
-          docker run -d --name minio-container -p 9000:9000 -p 9001:9001 \
-            -e MINIO_ROOT_USER=admin \
-            -e MINIO_ROOT_PASSWORD=password \
-            minio/minio:latest server /data
-          sleep 5
-          docker run --rm --network=host amazon/aws-cli s3 mb s3://test-bucket --endpoint-url http://127.0.0.1:9000/
+          docker run -d -p 9000:9000 --name minio \
+            -e "MINIO_ACCESS_KEY=minioadmin" \
+            -e "MINIO_SECRET_KEY=minioadmin" \
+            -v /tmp/data:/data \
+            -v /tmp/config:/root/.minio \
+            minio/minio server /data
+          aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://test-bucket
       
       - name: Run Python script in Docker
         run: |
