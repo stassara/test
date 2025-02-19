@@ -54,6 +54,11 @@ jobs:
             result = subprocess.run(cmd, shell=True, check=True)
             EOF
 
+      - name: Verificar que el archivo esté en el bucket de MinIO
+        run: |
+          echo "Verificando que el archivo esté en el bucket de MinIO..."
+          aws --endpoint-url http://127.0.0.1:9000 s3 ls s3://test-bucket/aaa/2.txt
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
