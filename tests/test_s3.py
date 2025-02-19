@@ -29,7 +29,7 @@ def test2_s3_upload():
         f.write("Hello, MinIO!")
 
     # Subir el archivo al bucket
-    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/test_filename s3://testbucket/test_filename"
+    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/testfile.txt s3://testbucket/testfile.txt"
     print(f"copying source to s3: {cmd}")
     result = subprocess.run(cmd, shell=True, check=True)
 
