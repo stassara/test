@@ -13,6 +13,13 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: Setup minio
         run: |
           docker run -d -p 9000:9000 --name minio \
@@ -27,13 +34,6 @@ jobs:
           export AWS_EC2_METADATA_DISABLED=true
 
           aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://testbucket
-
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
 
       - name: Set up Python
         uses: actions/setup-python@v2
