@@ -22,12 +22,17 @@ jobs:
             -e MINIO_ROOT_USER=admin \
             -e MINIO_ROOT_PASSWORD=password \
             minio/minio:latest server /data
+          sleep 5
+          docker run --rm --network=host amazon/aws-cli s3 mb s3://test-bucket --endpoint-url http://127.0.0.1:9000/
       
       - name: Run Python script in Docker
         run: |
           echo """
-          print(\"Hello from Python!\")
-          print(\"This is a multi-line script.\")
-          print(\"MinIO is running!\")
+          import os
+          os.makedirs('assets', exist_ok=True)
+          with open('assets/test.txt', 'w') as f:
+              f.write('Hello, MinIO!')
+          print('File created successfully.')
+          os.system('aws --endpoint-url http://localhost:9000 s3 cp assets/test.txt s3://test-bucket/test.txt')
           """ > script.py
-          docker run --rm --network=host -v $(pwd)/script.py:/script.py python:3.9 python /script.py
+          docker run --rm --network=host -v $(pwd)/script.py:/script.py python:3.9 bash -c "pip install awscli && python /script.py"
