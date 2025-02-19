@@ -37,6 +37,8 @@ jobs:
             import subprocess
             from pathlib import Path
 
+            os.makedirs("aaa", exist_ok=True)
+
             test_filename = "aaa/2.txt"
             with open(test_filename, "w") as f:
                 f.write("Hello, MinIO!")
