@@ -1,0 +1,33 @@
+name: MinIO and Python Script
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-minio-and-python:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Start MinIO in Docker
+        run: |
+          docker run -d --name minio-container -p 9000:9000 -p 9001:9001 \
+            -e MINIO_ROOT_USER=admin \
+            -e MINIO_ROOT_PASSWORD=password \
+            minio/minio:latest server /data
+      
+      - name: Run Python script in Docker
+        run: |
+          echo """
+          print(\"Hello from Python!\")
+          print(\"This is a multi-line script.\")
+          print(\"MinIO is running!\")
+          """ > script.py
+          docker run --rm --network=host -v $(pwd)/script.py:/script.py python:3.9 python /script.py
