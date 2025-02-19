@@ -1,5 +1,6 @@
 import os
 import subprocess
+from pathlib import Path
 
 def test_s3_upload():
     bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
@@ -27,7 +28,11 @@ def test2_s3_upload():
     with open(test_filename, "w") as f:
         f.write("Hello, MinIO!")
 
-    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp tests/testfile.txt s3://test-bucket/aaa/testfile.txt"
+    s3root = f"s3://test-bucket/aaa"
+    local_src = "assets/2.txt"
+    # sync local source to s3
+    filename = Path(local_src).name
+    cmd = f"aws --endpoint-url http://127.0.0.1:9000 s3 cp {local_src} {s3root}/{filename}"
     print(f"copying source to s3: {cmd}")
     result = subprocess.run(cmd, shell=True, check=True)
 
