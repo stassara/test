@@ -28,6 +28,11 @@ jobs:
             -v /tmp/config:/root/.minio \
             minio/minio server /data
 
+          aws configure set aws_access_key_id minioadmin --profile default
+          aws configure set aws_secret_access_key minioadmin --profile default
+          aws configure set region us-east-1 --profile default
+          aws configure set output json --profile default
+
           aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://test-bucket
 
       - name: Ejecutar código Python en línea
