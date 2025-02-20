@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_ENDPOINT_URL: "http://minio:9000"  # Usando el nombre del contenedor de MinIO
       AWS_ACCESS_KEY_ID: "minioadmin"
       AWS_SECRET_ACCESS_KEY: "minioadmin"
 
@@ -23,8 +22,10 @@ jobs:
 
       - name: Start MinIO in Docker
         run: |
-          # Levantar el contenedor de MinIO en una red personalizada
-          docker network create minio-network  # Crear una red personalizada
+          # Crear una red personalizada de Docker
+          docker network create minio-network
+
+          # Levantar el contenedor de MinIO en la red personalizada
           docker run -d --network minio-network --name minio \
             -e "MINIO_ACCESS_KEY=minioadmin" \
             -e "MINIO_SECRET_KEY=minioadmin" \
@@ -32,20 +33,26 @@ jobs:
             -v /tmp/config:/root/.minio \
             minio/minio server /data
 
-          # Esperar a que MinIO esté listo para aceptar conexiones
+          # Esperar unos segundos para asegurar que MinIO está listo
           sleep 10
 
-          # Crear un bucket para las pruebas
-          docker exec minio mc mb s3://localhost/test-bucket
+          # Obtener la IP del contenedor de MinIO
+          #MINIO_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' minio)
+          MINIO_IP=127.0.0.1
+
+          # Crear un bucket directamente con MinIO sin usar mc alias set
+          aws --endpoint-url http://${MINIO_IP}:9000 s3 mb s3://test-bucket
 
       - name: Set up pytest container
         run: |
-          # Ejecutar pytest dentro del contenedor de pytest conectado a la misma red que MinIO
+          # Ejecutar pytest dentro de un contenedor conectado a la misma red de MinIO
           docker run --rm --network minio-network -v $GITHUB_WORKSPACE:/app -w /app python:3.9-slim bash -c "pip install pytest boto3 && pytest"
 
       - name: Post-test cleanup
         run: |
-          # Detener y eliminar el contenedor de MinIO después de las pruebas
+          # Detener y eliminar el contenedor de MinIO
           docker stop minio
           docker rm minio
-          docker network rm minio-network  # Limpiar la red personalizada
+
+          # Eliminar la red personalizada de Docker
+          docker network rm minio-network
