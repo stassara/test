@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
+import boto3
 
 def test_s3_upload():
     bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
