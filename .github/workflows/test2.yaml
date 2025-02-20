@@ -42,7 +42,7 @@ jobs:
       - name: Set up pytest container
         run: |
           # Ejecutar pytest dentro de un contenedor conectado a la misma red de MinIO
-          docker run --rm --network minio-network -v $GITHUB_WORKSPACE:/app -w /app python:3.9-slim bash -c "pip install pytest boto3 && pytest --endpoint-url http://localhost:9000"
+          docker run --rm --network minio-network -v $GITHUB_WORKSPACE:/app -w /app python:3.9-slim bash -c "pip install pytest boto3 && pytest"
 
       - name: Post-test cleanup
         run: |
