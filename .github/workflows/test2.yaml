@@ -35,8 +35,7 @@ jobs:
           sleep 10
 
           # Crear un bucket para las pruebas
-          docker exec minio mc alias set myminio http://127.0.0.1:9000
-          docker exec minio mc mb myminio/test-bucket
+          docker exec minio mc mb s3://test-bucket/test-bucket
 
       - name: Set up Docker for pytest
         run: |
