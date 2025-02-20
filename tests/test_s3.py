@@ -11,7 +11,10 @@ def test_s3_upload():
 
     # Subir el archivo al bucket
     result = subprocess.run(
-        ["aws", "--endpoint-url", "http://minio:9000", "s3", "cp", test_filename, f"s3://test-bucket/"],
+        [
+            "aws", "s3", "cp", test_filename, f"s3://test-bucket/",
+            "--endpoint-url", "http://minio:9000"  # Indica que MinIO es el destino
+        ],
         capture_output=True,
         text=True
     )
