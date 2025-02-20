@@ -43,7 +43,7 @@ def test3_s3_upload():
     print("#####################")
 
     # Configuración de MinIO
-    MINIO_URL = "http://127.0.0.1:9000"  # Reemplaza con la URL de tu MinIO
+    MINIO_URL = "http://minio:9000"  # Reemplaza con la URL de tu MinIO
     ACCESS_KEY = "minioadmin"
     SECRET_KEY = "minioadmin"
     BUCKET_NAME = "test-bucket"  # Cambia esto por el nombre de tu bucket
