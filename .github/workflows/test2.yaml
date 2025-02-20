@@ -1,0 +1,58 @@
+name: MinIO and Python Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      minio:
+        image: minio/minio
+        ports:
+          - 9000:9000
+        env:
+          MINIO_ACCESS_KEY: minioadmin
+          MINIO_SECRET_KEY: minioadmin
+        options: >
+          --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        command: server /data
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker
+        run: |
+          docker network create minio-network
+
+      - name: Start MinIO in Docker
+        run: |
+          docker run -d -p 9000:9000 --name minio \
+            -e "MINIO_ACCESS_KEY=minioadmin" \
+            -e "MINIO_SECRET_KEY=minioadmin" \
+            -v /tmp/data:/data \
+            -v /tmp/config:/root/.minio \
+            minio/minio server /data
+
+      - name: Create test bucket
+        run: |
+          docker run --network=minio-network --rm \
+            minio/mc alias set myminio http://minio:9000 minioadmin minioadmin && \
+            docker run --network=minio-network --rm minio/mc mb myminio/test-bucket
+      
+      - name: Run Tests with Pytest in Docker
+        run: |
+          docker build -t pytest-runner .
+          docker run --network=minio-network -e AWS_ENDPOINT_URL=http://minio:9000 \
+            -e AWS_ACCESS_KEY_ID=minioadmin \
+            -e AWS_SECRET_ACCESS_KEY=minioadmin \
+            pytest-runner
