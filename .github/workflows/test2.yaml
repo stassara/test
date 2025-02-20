@@ -27,8 +27,8 @@ jobs:
 
           # Levantar el contenedor de MinIO en la red personalizada
           docker run -d --network minio-network -p 9000:9000 --name minio \
-            -e "MINIO_ACCESS_KEY=minioadmin" \
-            -e "MINIO_SECRET_KEY=minioadmin" \
+            -e "MINIO_ACCESS_KEY=$AWS_ACCESS_KEY_ID" \
+            -e "MINIO_SECRET_KEY=$AWS_SECRET_ACCESS_KEY" \
             -v /tmp/data:/data \
             -v /tmp/config:/root/.minio \
             minio/minio server /data
@@ -43,8 +43,8 @@ jobs:
         run: |
           # Ejecutar pytest dentro de un contenedor conectado a la misma red de MinIO
           docker run --rm --network minio-network \
-          -e AWS_ACCESS_KEY_ID=minioadmin \
-          -e AWS_SECRET_ACCESS_KEY=minioadmin \
+          -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+          -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
           -v $GITHUB_WORKSPACE:/app -w /app python:3.9-slim bash -c "pip install awscli boto3 pytest && pytest"
 
       - name: Post-test cleanup
