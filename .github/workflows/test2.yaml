@@ -37,12 +37,12 @@ jobs:
           sleep 20
 
           # Crear un bucket directamente con MinIO sin usar mc alias set
-          aws --endpoint-url http://minio:9000 s3 mb s3://test-bucket
+          aws --endpoint-url http://localhost:9000 s3 mb s3://test-bucket
 
       - name: Set up pytest container
         run: |
           # Ejecutar pytest dentro de un contenedor conectado a la misma red de MinIO
-          docker run --rm --network minio-network -v $GITHUB_WORKSPACE:/app -w /app python:3.9-slim bash -c "pip install pytest boto3 && pytest --endpoint-url http://minio:9000"
+          docker run --rm --network minio-network -v $GITHUB_WORKSPACE:/app -w /app python:3.9-slim bash -c "pip install pytest boto3 && pytest --endpoint-url http://localhost:9000"
 
       - name: Post-test cleanup
         run: |
