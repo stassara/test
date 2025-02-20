@@ -26,7 +26,7 @@ jobs:
           docker network create minio-network
 
           # Levantar el contenedor de MinIO en la red personalizada
-          docker run -d --network minio-network --name minio \
+          docker run -d --network minio-network -p 9000:9000 --name minio \
             -e "MINIO_ACCESS_KEY=minioadmin" \
             -e "MINIO_SECRET_KEY=minioadmin" \
             -v /tmp/data:/data \
@@ -36,12 +36,8 @@ jobs:
           # Esperar unos segundos para asegurar que MinIO está listo
           sleep 10
 
-          # Obtener la IP del contenedor de MinIO
-          #MINIO_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' minio)
-          MINIO_IP=127.0.0.1
-
           # Crear un bucket directamente con MinIO sin usar mc alias set
-          aws --endpoint-url http://${MINIO_IP}:9000 s3 mb s3://test-bucket
+          aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://test-bucket
 
       - name: Set up pytest container
         run: |
