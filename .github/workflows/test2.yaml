@@ -23,18 +23,21 @@ jobs:
       - name: Start MinIO in Docker
         run: |
           # Crear una red personalizada de Docker
-          docker network create minio-network
+          docker network create minio-network || true
 
           # Levantar el contenedor de MinIO en la red personalizada
           docker run -d --network minio-network -p 9000:9000 --name minio \
             -e "MINIO_ACCESS_KEY=$AWS_ACCESS_KEY_ID" \
             -e "MINIO_SECRET_KEY=$AWS_SECRET_ACCESS_KEY" \
-            -v /tmp/data:/data \
-            -v /tmp/config:/root/.minio \
+            -v minio-data:/data \
+            -v minio-config:/root/.minio \
             minio/minio server /data
 
-          # Esperar más tiempo para asegurar que MinIO está listo
-          sleep 20
+          # Esperar a que MinIO esté listo (sin usar sleep)
+          until aws --endpoint-url http://127.0.0.1:9000 s3 ls; do
+            echo "Esperando a que MinIO esté listo..."
+            sleep 5
+          done
 
           # Crear un bucket directamente con MinIO sin usar mc alias set
           aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://test-bucket
@@ -54,4 +57,4 @@ jobs:
           docker rm minio
 
           # Eliminar la red personalizada de Docker
-          docker network rm minio-network
+          docker network rm minio-network || true
