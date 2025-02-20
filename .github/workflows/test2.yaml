@@ -1,4 +1,4 @@
-name: MinIO and Python Tests
+name: MinIO and Python Script
 
 on:
   push:
@@ -9,33 +9,21 @@ on:
       - main
 
 jobs:
-  test:
+  run-minio-and-python:
     runs-on: ubuntu-latest
-    services:
-      minio:
-        image: minio/minio
-        ports:
-          - 9000:9000
-        env:
-          MINIO_ACCESS_KEY: minioadmin
-          MINIO_SECRET_KEY: minioadmin
-        options: >
-          --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-        command: server /data
-    
+
+    env:
+      AWS_ENDPOINT_URL: "http://127.0.0.1:9000"
+      AWS_ACCESS_KEY_ID: "minioadmin"
+      AWS_SECRET_ACCESS_KEY: "minioadmin"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set up Docker
-        run: |
-          docker network create minio-network
 
       - name: Start MinIO in Docker
         run: |
+          # Levantar el contenedor de MinIO
           docker run -d -p 9000:9000 --name minio \
             -e "MINIO_ACCESS_KEY=minioadmin" \
             -e "MINIO_SECRET_KEY=minioadmin" \
@@ -43,16 +31,30 @@ jobs:
             -v /tmp/config:/root/.minio \
             minio/minio server /data
 
-      - name: Create test bucket
+          # Esperar a que MinIO esté listo para aceptar conexiones
+          sleep 10
+
+          # Crear un bucket para las pruebas
+          docker exec minio mc alias set myminio http://minioadmin:minioadmin@127.0.0.1:9000
+          docker exec minio mc mb myminio/test-bucket
+
+      - name: Set up Docker for pytest
         run: |
-          docker run --network=minio-network --rm \
-            minio/mc alias set myminio http://minio:9000 minioadmin minioadmin && \
-            docker run --network=minio-network --rm minio/mc mb myminio/test-bucket
-      
-      - name: Run Tests with Pytest in Docker
+          # Crear el contenedor de pytest con las dependencias necesarias
+          docker build -t pytest-container -f Dockerfile .
+
+      - name: Run pytest inside Docker container
         run: |
-          docker build -t pytest-runner .
-          docker run --network=minio-network -e AWS_ENDPOINT_URL=http://minio:9000 \
-            -e AWS_ACCESS_KEY_ID=minioadmin \
-            -e AWS_SECRET_ACCESS_KEY=minioadmin \
-            pytest-runner
+          # Ejecutar pytest dentro del contenedor de pytest, vinculado al contenedor de MinIO
+          docker run --rm \
+            -e AWS_ENDPOINT_URL=${{ env.AWS_ENDPOINT_URL }} \
+            -e AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }} \
+            -e AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }} \
+            --link minio \
+            pytest-container
+
+      - name: Post-test cleanup
+        run: |
+          # Detener y eliminar el contenedor de MinIO después de las pruebas
+          docker stop minio
+          docker rm minio
