@@ -33,8 +33,8 @@ jobs:
             -v /tmp/config:/root/.minio \
             minio/minio server /data
 
-          # Esperar unos segundos para asegurar que MinIO está listo
-          sleep 10
+          # Esperar más tiempo para asegurar que MinIO está listo
+          sleep 20
 
           # Crear un bucket directamente con MinIO sin usar mc alias set
           aws --endpoint-url http://minio:9000 s3 mb s3://test-bucket
