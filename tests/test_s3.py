@@ -39,7 +39,7 @@ def test2_s3_upload():
 
     assert result.returncode == 0, f"Failed to upload file: {result.stderr}"
 
-def test2_s3_upload():
+def test3_s3_upload():
     print("#####################")
 
     # Configuración de MinIO
