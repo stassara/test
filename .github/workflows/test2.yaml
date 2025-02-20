@@ -37,7 +37,7 @@ jobs:
           sleep 20
 
           # Crear un bucket directamente con MinIO sin usar mc alias set
-          aws --endpoint-url http://localhost:9000 s3 mb s3://test-bucket
+          aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://test-bucket
 
       - name: Set up pytest container
         run: |
