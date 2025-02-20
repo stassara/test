@@ -5,7 +5,7 @@ import boto3
 
 def test_s3_upload():
     bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
-    endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://127.0.0.1:9000")
+    endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://minio:9000")
 
     # Crear un archivo de prueba
     test_filename = "testfile.txt"
