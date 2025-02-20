@@ -4,9 +4,6 @@ from pathlib import Path
 import boto3
 
 def test_s3_upload():
-    bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
-    endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://minio:9000")
-
     # Crear un archivo de prueba
     test_filename = "testfile.txt"
     with open(test_filename, "w") as f:
@@ -14,7 +11,7 @@ def test_s3_upload():
 
     # Subir el archivo al bucket
     result = subprocess.run(
-        ["aws", "--endpoint-url", endpoint_url, "s3", "cp", test_filename, f"s3://{bucket_name}/"],
+        ["aws", "--endpoint-url", "http://minio:9000", "s3", "cp", test_filename, f"s3://test-bucket/"],
         capture_output=True,
         text=True
     )
@@ -22,9 +19,6 @@ def test_s3_upload():
     assert result.returncode == 0, f"Failed to upload file: {result.stderr}"
 
 def test2_s3_upload():
-    bucket_name = os.getenv("AWS_S3_BUCKET", "test-bucket")
-    endpoint_url = os.getenv("AWS_S3_ENDPOINT", "http://minio:9000")
-
     test_filename = "testfile.txt"
     with open(test_filename, "w") as f:
         f.write("Hello, MinIO!")
@@ -43,9 +37,6 @@ def test3_s3_upload():
     print("#####################")
 
     # Configuración de MinIO
-    MINIO_URL = "http://minio:9000"  # Reemplaza con la URL de tu MinIO
-    ACCESS_KEY = "minioadmin"
-    SECRET_KEY = "minioadmin"
     BUCKET_NAME = "test-bucket"  # Cambia esto por el nombre de tu bucket
     FILE_NAME = "archivo_prueba.txt"  # Archivo a crear y subir
     OBJECT_KEY = "archivo_prueba.txt"  # Nombre del archivo en MinIO
@@ -53,9 +44,9 @@ def test3_s3_upload():
     # Crear cliente S3 para MinIO
     s3_client = boto3.client(
         "s3",
-        endpoint_url=MINIO_URL,
-        aws_access_key_id=ACCESS_KEY,
-        aws_secret_access_key=SECRET_KEY,
+        endpoint_url="http://minio:9000",
+        aws_access_key_id="minioadmin",
+        aws_secret_access_key="minioadmin",
     )
 
     print("Testear conexión listando buckets")
@@ -86,7 +77,7 @@ def test3_s3_upload():
         "aws", "s3", "cp",
         FILE_NAME,  # Archivo local
         f"s3://{BUCKET_NAME}/{OBJECT_KEY}",  # Destino en MinIO
-        "--endpoint-url", MINIO_URL  # Indica que MinIO es el destino
+        "--endpoint-url", "http://minio:9000"  # Indica que MinIO es el destino
     ]
 
     result = subprocess.run(aws_s3_cp_command, capture_output=True, text=True)
