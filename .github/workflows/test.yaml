@@ -29,7 +29,7 @@ jobs:
             -v /tmp/data:/data \
             -v /tmp/config:/root/.minio \
             minio/minio server /data
-          aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://test-bucket
+          aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://test-bucket
       
       - name: Run Python script in Docker
         run: |
@@ -39,6 +39,6 @@ jobs:
           with open('assets/test.txt', 'w') as f:
               f.write('Hello, MinIO!')
           print('File created successfully.')
-          os.system('aws --endpoint-url http://localhost:9000 s3 cp assets/test.txt s3://test-bucket/test.txt')
+          os.system('aws --endpoint-url http://127.0.0.1:9000 s3 cp assets/test.txt s3://test-bucket/test.txt')
           """ > script.py
           docker run --rm --network=host -v $(pwd)/script.py:/script.py python:3.9 bash -c "pip install awscli && python /script.py"
